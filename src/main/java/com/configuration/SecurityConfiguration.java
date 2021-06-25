@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -21,6 +22,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 @EnableWebSecurity
+//to make preauthorise annotation work
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private final PasswordEncoder passwordEncoder;
 	/*
@@ -60,11 +63,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		 * user who is accessing the role has STUDENT role. if the role is anything else then
 		 * deny it.
 		 */
-		.antMatchers("/management/student/**").hasAnyRole(ADMIN.name(),ADMINTRAINEE.name())
-		
-		.antMatchers(HttpMethod.DELETE, "/management/student/**").hasAuthority(COURSE_WRITE.name())
-		.antMatchers(HttpMethod.POST, "/management/student/**").hasAuthority(COURSE_WRITE.name())
-		.antMatchers(HttpMethod.PUT, "/management/student/**").hasAuthority(COURSE_WRITE.name())
+		//replacing with preauth
+//		.antMatchers(HttpMethod.DELETE, "/management/student/**").hasAuthority(COURSE_WRITE.name())
+//		.antMatchers(HttpMethod.POST, "/management/student/**").hasAuthority(COURSE_WRITE.name())
+//		.antMatchers(HttpMethod.PUT, "/management/student/**").hasAuthority(COURSE_WRITE.name())
+//		.antMatchers("/management/student/**").hasAnyRole(ADMIN.name(),ADMINTRAINEE.name())
 		/*
 		 * PERMISSION BASED AUTHENTICATION==hasAuthority
 		 * GIVE delete,put and post permission to users having role course_write

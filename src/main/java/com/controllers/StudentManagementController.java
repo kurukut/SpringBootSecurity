@@ -3,6 +3,7 @@ package com.controllers;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,7 @@ public class StudentManagementController {
 	 * tom is admintrainee==ony read
 	 */
 	@GetMapping("/studentId/{studentId}")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_ADMINTRAINEE')")
 	public Student getUser(@PathVariable("studentId") Integer studentId) {
 		return STUDENTS.stream()
 		.filter(student->studentId.equals(student.getStudentId()))
@@ -34,23 +36,27 @@ public class StudentManagementController {
 	}
 	
 	@GetMapping
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_ADMINTRAINEE')")
 	public List<Student> getAllStudents(){
 		return STUDENTS;
 	}
 	
 	@PostMapping
+	@PreAuthorize("hasAuthority('course:write')")
 	public void insertNewStudent(@RequestBody Student student) {
 		System.out.println("insertNewStudent");
 		System.out.println(student);
 	}
 	
 	@DeleteMapping("{studentId}")
+	@PreAuthorize("hasAuthority('course:write')")
 	public void deleteStudent(@PathVariable int studentId) {
 		System.out.println("deleteStudent");
 		System.out.println(studentId);
 	}
 	
 	@PutMapping("{studentId}")
+	@PreAuthorize("hasAuthority('course:write')")
 	public void updateStudent(@PathVariable int studentId,
 			@RequestBody Student student) {
 		System.out.println("updateStudent");
