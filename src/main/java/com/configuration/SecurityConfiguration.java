@@ -1,6 +1,9 @@
 package com.configuration;
 
 
+import static com.configuration.ApplicationUserRole.ADMIN;
+import static com.configuration.ApplicationUserRole.STUDENT;//ctrl shift M
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -63,12 +66,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		UserDetails kurukutUser=User.builder()
 				.username("kuru")
 				.password(passwordEncoder.encode("password"))
-				.roles("STUDENT")
+				.roles(STUDENT.name())
 				.build();
 		/*
 		 * instead of inbuild uname pwd we can use these credentials to login
 		 */
 		
-		return new InMemoryUserDetailsManager(kurukutUser);
+		UserDetails murumonUser=User.builder()
+				.username("muru")
+				.password(passwordEncoder.encode("password"))
+				.roles(ADMIN.name())
+				.build();
+		
+		return new InMemoryUserDetailsManager(kurukutUser,
+				murumonUser);
 	}
 }
