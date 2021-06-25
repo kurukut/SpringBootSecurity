@@ -60,10 +60,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		 * user who is accessing the role has STUDENT role. if the role is anything else then
 		 * deny it.
 		 */
+		.antMatchers("/management/student/**").hasAnyRole(ADMIN.name(),ADMINTRAINEE.name())
+		
 		.antMatchers(HttpMethod.DELETE, "/management/student/**").hasAuthority(COURSE_WRITE.name())
 		.antMatchers(HttpMethod.POST, "/management/student/**").hasAuthority(COURSE_WRITE.name())
 		.antMatchers(HttpMethod.PUT, "/management/student/**").hasAuthority(COURSE_WRITE.name())
-		.antMatchers("/management/student/**").hasAnyRole(ADMIN.name(),ADMINTRAINEE.name())
 		/*
 		 * PERMISSION BASED AUTHENTICATION==hasAuthority
 		 * GIVE delete,put and post permission to users having role course_write
@@ -85,10 +86,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Bean
 	protected UserDetailsService userDetailsService() {
 		// TODO Auto-generated method stub
+		/*
+		 * UserDeatils is an interface
+		 *  roles(STUDENT.name()) adds the role to a list
+		 *  this functionality is represented by authorities()
+		 *  so we are generating our collection set permissions which includes 
+		 *  roles and permissions and we pass this collection to authorities()
+		 *  open roles() for more info
+		 */
 		UserDetails kurukutUser=User.builder()
 				.username("kuru")
 				.password(passwordEncoder.encode("password"))
-				.roles(STUDENT.name())
+				//.roles(STUDENT.name())
+				.authorities(STUDENT.getGrantedAuthorities())
 				.build();
 		/*
 		 * instead of inbuild uname pwd we can use these credentials to login
@@ -97,19 +107,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		UserDetails murumonUser=User.builder()
 				.username("muru")
 				.password(passwordEncoder.encode("password"))
-				.roles(ADMIN.name())
+				//.roles(ADMIN.name())
+				.authorities(ADMIN.getGrantedAuthorities())
 				.build();
 		
 		UserDetails lindaUser=User.builder()
 				.username("linda")
 				.password(passwordEncoder.encode("password"))
-				.roles(ADMIN.name())
+				//.roles(ADMIN.name())
+				.authorities(ADMIN.getGrantedAuthorities())
 				.build();
 		
 		UserDetails tomUser=User.builder()
 				.username("tom")
 				.password(passwordEncoder.encode("password"))
-				.roles(ADMINTRAINEE.name())
+				//.roles(ADMINTRAINEE.name())
+				.authorities(ADMINTRAINEE.getGrantedAuthorities())
 				.build();
 		
 		return new InMemoryUserDetailsManager(kurukutUser,
