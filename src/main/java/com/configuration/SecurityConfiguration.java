@@ -1,12 +1,15 @@
 package com.configuration;
 
 
+import static com.configuration.ApplicationUserPermission.COURSE_WRITE;
 import static com.configuration.ApplicationUserRole.ADMIN;
+import static com.configuration.ApplicationUserRole.ADMINTRAINEE;
 import static com.configuration.ApplicationUserRole.STUDENT;//ctrl shift M
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -44,9 +47,28 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
+		.csrf().disable()
+		/*
+		 * to make post,delete,put requests work
+		 */
 		.authorizeRequests()
 		.antMatchers("/","index","/css/*","/js/*").permitAll()
 		.antMatchers("/student/**").hasAnyRole(STUDENT.name())
+		/*ROLE BASED AUTH===hasRole
+		 * the http request will involve the api calls
+		 * any api call starting with student should be allowed only if the 
+		 * user who is accessing the role has STUDENT role. if the role is anything else then
+		 * deny it.
+		 */
+		.antMatchers(HttpMethod.DELETE, "/management/student/**").hasAuthority(COURSE_WRITE.name())
+		.antMatchers(HttpMethod.POST, "/management/student/**").hasAuthority(COURSE_WRITE.name())
+		.antMatchers(HttpMethod.PUT, "/management/student/**").hasAuthority(COURSE_WRITE.name())
+		.antMatchers("/management/student/**").hasAnyRole(ADMIN.name(),ADMINTRAINEE.name())
+		/*
+		 * PERMISSION BASED AUTHENTICATION==hasAuthority
+		 * GIVE delete,put and post permission to users having role course_write
+		 * give access to the management apis to users having roles admin/admintrainee
+		 */
 		.anyRequest()
 		.authenticated()//uname and pwd
 		.and()
@@ -78,7 +100,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.roles(ADMIN.name())
 				.build();
 		
+		UserDetails lindaUser=User.builder()
+				.username("linda")
+				.password(passwordEncoder.encode("password"))
+				.roles(ADMIN.name())
+				.build();
+		
+		UserDetails tomUser=User.builder()
+				.username("tom")
+				.password(passwordEncoder.encode("password"))
+				.roles(ADMINTRAINEE.name())
+				.build();
+		
 		return new InMemoryUserDetailsManager(kurukutUser,
-				murumonUser);
+				murumonUser,
+				lindaUser,
+				tomUser);
 	}
 }
